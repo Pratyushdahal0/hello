@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>❤️</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: black;
+        overflow: hidden;
+        height: 100%;
+        font-family: Verdana, sans-serif;
+      }
+
+      canvas {
+        display: block;
+        cursor: pointer;
+      }
+
+      #text {
+        position: absolute;
+        top: 12%;
+        width: 100%;
+        text-align: center;
+        color: white;
+        font-size: 2.5rem;
+        letter-spacing: 1px;
+        text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+        z-index: 10;
+
+        /* HIDDEN INITIALLY */
+        opacity: 0;
+        transition: opacity 1.5s ease;
+      }
+
+      #text.show {
+        opacity: 1;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="text">Please click on the heart 🤍</div>
+    <canvas id="canvas"></canvas>
+
+    <script>
+      const canvas = document.getElementById("canvas");
+      const ctx = canvas.getContext("2d");
+      const text = document.getElementById("text");
+
+      function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      resize();
+      window.addEventListener("resize", resize);
+
+      // Heart points
+      const points = [];
+      const steps = 700;
+
+      for (let i = 0; i <= steps; i++) {
+        const t = (Math.PI * 2 * i) / steps;
+        const x = 16 * Math.pow(Math.sin(t), 3);
+        const y = -(
+          13 * Math.cos(t) -
+          5 * Math.cos(2 * t) -
+          2 * Math.cos(3 * t) -
+          Math.cos(4 * t)
+        );
+        points.push({ x, y });
+      }
+
+      let cx = canvas.width / 2;
+      let cy = canvas.height / 2 + 40;
+
+      let drawIndex = 0;
+      let heartReady = false;
+
+      function drawHeart() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        ctx.beginPath();
+        ctx.moveTo(cx + points[0].x * 14, cy + points[0].y * 14);
+
+        for (let i = 1; i < drawIndex; i++) {
+          ctx.lineTo(cx + points[i].x * 14, cy + points[i].y * 14);
+        }
+
+        ctx.strokeStyle = "red";
+        ctx.lineWidth = 3;
+        ctx.shadowColor = "red";
+        ctx.shadowBlur = 15;
+        ctx.stroke();
+
+        drawIndex++;
+
+        if (drawIndex <= points.length) {
+          requestAnimationFrame(drawHeart);
+        } else {
+          fillHeart();
+          heartReady = true;
+
+          // SHOW TEXT AFTER HEART IS DONE
+          text.classList.add("show");
+        }
+      }
+
+      function fillHeart() {
+        ctx.beginPath();
+        ctx.moveTo(cx + points[0].x * 14, cy + points[0].y * 14);
+        points.forEach((p) => {
+          ctx.lineTo(cx + p.x * 14, cy + p.y * 14);
+        });
+        ctx.fillStyle = "red";
+        ctx.shadowBlur = 25;
+        ctx.fill();
+      }
+
+      // Click → next page
+      canvas.addEventListener("click", () => {
+        if (heartReady) {
+          window.location.href = "proposal.html";
+        }
+      });
+
+      drawHeart();
+    </script>
+  </body>
+</html>
